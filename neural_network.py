@@ -1,12 +1,12 @@
 import numpy as np
-from scipy.special import expit  # sigmoid function
+from scipy.special import expit, logit  # sigmoid function and it's inverse
 
 
 # neural network class definition
 class NeuralNetwork:
 
-    # initialize the neural network
     def __init__(self, input_nodes, hidden_nodes, output_nodes, learning_rate):
+        """initialize the neural network"""
         # set number of nodes in each input, hidden and output layers
         self.inodes = input_nodes
         self.hnodes = hidden_nodes
@@ -25,9 +25,10 @@ class NeuralNetwork:
 
         # activation function is the sigmoid function
         self.activation_function = lambda x: expit(x)
+        self.inverse_activation_function = lambda x: logit(x)
 
-    # train the neural network
     def train(self, inputs_list, targets_list):
+        """train the neural network"""
         # convert inputs list to 2D array
         inputs = np.array(inputs_list, ndmin=2).T
         targets = np.array(targets_list, ndmin=2).T
@@ -53,8 +54,8 @@ class NeuralNetwork:
         # update the weights for the links between the input and hidden layers
         self.wih += self.lr * np.dot((hidden_errors * hidden_outputs * (1.0 - hidden_outputs)), np.transpose(inputs))
 
-    # query the neural network
     def query(self, inputs_list):
+        """query the neural network"""
         # convert inputs list to 2D array
         inputs = np.array(inputs_list, ndmin=2).T
 
@@ -70,7 +71,40 @@ class NeuralNetwork:
 
         return final_outputs
 
+    def backquery(self, targets_list):
+        """backquery the neural network.
+        we'll use the same termnimology to each item, 
+        eg target are the values at the right of the network, albeit used as input
+        eg hidden_output is the signal to the right of the middle nodes
+        """
+        # transpose the targets list to a vertical array
+        final_outputs = np.array(targets_list, ndmin=2).T
+        
+        # calculate the signal into the final output layer
+        final_inputs = self.inverse_activation_function(final_outputs)
 
+        # calculate the signal out of the hidden layer
+        hidden_outputs = np.dot(self.who.T, final_inputs)
+        # scale them back to 0.01 to .99
+        hidden_outputs -= np.min(hidden_outputs)
+        hidden_outputs /= np.max(hidden_outputs)
+        hidden_outputs *= 0.98
+        hidden_outputs += 0.01
+        
+        # calculate the signal into the hidden layer
+        hidden_inputs = self.inverse_activation_function(hidden_outputs)
+        
+        # calculate the signal out of the input layer
+        inputs = np.dot(self.wih.T, hidden_inputs)
+        # scale them back to 0.01 to .99
+        inputs -= np.min(inputs)
+        inputs /= np.max(inputs)
+        inputs *= 0.98
+        inputs += 0.01
+        
+        return inputs
+
+    
 if __name__ == '__main__':
     input_nodes, hidden_nodes, output_nodes = 3, 3, 3
     learning_rate = 0.3
