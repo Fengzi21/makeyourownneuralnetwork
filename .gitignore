@@ -4,4 +4,3 @@ __pycache__/
 .ipynb_checkpoints/
 mnist_dataset/.ipynb_checkpoints/
 .virtual_documents/
-pytorch/.git_bak
