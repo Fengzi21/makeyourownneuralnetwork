@@ -4,3 +4,6 @@ __pycache__/
 .ipynb_checkpoints/
 mnist_dataset/.ipynb_checkpoints/
 .virtual_documents/
+workspace.code*
+*.pkl
+*.log
