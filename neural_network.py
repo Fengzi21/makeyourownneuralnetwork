@@ -7,6 +7,8 @@ import pandas as pd    # for plotting progress
 import numpy as np
 from scipy.special import expit, logit    # sigmoid function and it's inverse
 
+from rich import print  # comment this if rich is not installed
+
 
 def to_col_vec(row_list):
     """Convert a non-nested list to a column vector.
@@ -30,7 +32,8 @@ class Classifier:
     """A MNIST dataset classifier building from scratch with pure python, numpy and scipy.
     """
     def __init__(self, input_nodes, hidden_nodes, output_nodes, learning_rate):
-        """Initialize the neural network."""
+        """Initialize the neural network.
+        """
         # set number of nodes in input, hidden and output layers
         self.inodes, self.hnodes, self.onodes = input_nodes, hidden_nodes, output_nodes
 
@@ -77,7 +80,7 @@ class Classifier:
         return (final_outputs, hidden_outputs) if return_hidden_outputs else final_outputs
     
         
-    def train(self, inputs_list, targets_list):
+    def train(self, inputs_list, targets_list, print_counter=False):
         """Train the neural network.
         """
         # convert inputs and targets lists to 2D arrays
@@ -106,9 +109,9 @@ class Classifier:
         if (self.counter % 10 == 0):
             self.progress.append(np.sum(output_errors**2)/output_errors.size)
 
-        # print error every 10000 loops
-        # if (self.counter % 10000 == 0):
-        #     print("counter = ", self.counter)
+        # print counter every 10000 loops
+        if print_counter and (self.counter % 10000 == 0):
+            print("counter = ", self.counter)
         
 
     def backquery(self, targets_list):
@@ -141,11 +144,12 @@ class Classifier:
         df = pd.DataFrame(self.progress, columns=['loss'])
         plt_kwargs = {
             'figsize':  (16, 8), 
-            'ylim':  (0, 1.0), 
+            # 'ylim':  (0, 1.0), 
+            'ylim':  (0, max(self.progress)), 
             'alpha':  0.1, 
             'marker':  '.', 
             'grid':  True, 
-            'yticks':  (0, 0.25, 0.5)
+            # 'yticks':  (0, 0.25, 0.5)
         }
         df.plot(**plt_kwargs)
 

@@ -1,12 +1,10 @@
 import time
 import itertools
-import glob
 
 import numpy as np
-import scipy.ndimage
-import imageio
 from caput import mpiutil as mpi
 from rich import print
+import scipy.ndimage
 
 from neural_network import Classifier
 
