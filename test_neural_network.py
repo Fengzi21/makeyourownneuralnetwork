@@ -1,8 +1,8 @@
-import dill as pickle
-
 import pytest
 import numpy as np
 import matplotlib.pyplot as plt
+
+import dill as pickle
 
 from neural_network import Classifier
 
@@ -10,7 +10,7 @@ from neural_network import Classifier
 class TestClassifier:
 
     # shared resources
-    input_nodes, hidden_nodes, output_nodes = 28*28, 200, 10
+    input_nodes, hidden_nodes, output_nodes = 28 * 28, 200, 10
     learning_rate = 0.1
 
     # create instance of neural network
@@ -20,13 +20,11 @@ class TestClassifier:
     def setup_class(cls):
         print(f'Setting up class: {cls.__name__}')
 
-
     def test_query(self):
         input_list = np.random.rand(self.input_nodes)
         final_outputs = self.n.query(input_list)
-        print(f"{final_outputs = }")
+        print(f'{final_outputs = }')
         assert final_outputs.shape == (self.output_nodes, 1)
-
 
     @pytest.mark.plot
     def test_backquery(self):
@@ -34,7 +32,7 @@ class TestClassifier:
         # create the output signals for this label
         targets = np.zeros(self.output_nodes) + 0.01
         targets[label] = 0.99
-        print(f"{targets = }")
+        print(f'{targets = }')
 
         # get image data
         image_data = self.n.backquery(targets)
@@ -48,7 +46,6 @@ class TestClassifier:
         plt.show()
         plt.close()
 
-
     @pytest.mark.plot
     def test_plot_progress(self):
         self.n.progress = np.random.rand(20000)
@@ -56,10 +53,9 @@ class TestClassifier:
         plt.show()
         plt.close()
 
-
     @pytest.mark.pickle
     def test_pickle(self):
-        filename ='test_classifier.pkl' 
+        filename = 'test_classifier.pkl'
         self.n.pickle(filename)
 
         with open(filename, 'rb') as f:
@@ -70,7 +66,6 @@ class TestClassifier:
         for attr in dir(self.n):
             if not attr.startswith('__'):
                 assert hasattr(nn, attr)
-
 
     @classmethod
     def teardown_class(cls):
