@@ -2,10 +2,10 @@
 
 
 import numpy as np
-from scipy.special import expit, logit    # sigmoid function and it's inverse
-import dill as pickle   # for pickling the trained neural network
-import pandas as pd     # for plotting progress
-from rich import print  # comment this if rich is not installed
+from scipy.special import expit, logit  # sigmoid function and it's inverse
+import dill as pickle                   # for pickling the trained neural network
+import pandas as pd                     # for plotting progress
+from rich import print                  # comment this out if rich is not installed
 
 
 def to_col_vec(row_list):
@@ -66,11 +66,13 @@ class Classifier:
 
         # calculate signals into hidden layer
         hidden_inputs = np.dot(self.wih, inputs)
+
         # calculate the signals emerging from hidden layer
         hidden_outputs = self.activation_function(hidden_inputs)
 
         # calculate signals into final output layer
         final_inputs = np.dot(self.who, hidden_outputs)
+
         # calculate the signals emerging from final output layer
         final_outputs = self.activation_function(final_inputs)
 
@@ -83,12 +85,13 @@ class Classifier:
         inputs = to_col_vec(inputs_list)
         targets = to_col_vec(targets_list)
 
-        # == feed forward ==#
+        # == feed forward == #
         final_outputs, hidden_outputs = self.forward(inputs_list, return_hidden_outputs=True)
 
-        # == backpropagation ==#
+        # == backpropagation == #
         # output layer error is the (target - actual)
         output_errors = targets - final_outputs
+
         # hidden layer error is the output_errors, split by weights, recombined at hidden nodes
         hidden_errors = np.dot(self.who.T, output_errors)
 
@@ -122,11 +125,13 @@ class Classifier:
 
         # calculate the signal into the final output layer
         final_inputs = self.inverse_activation_function(final_outputs)
+
         # calculate the signal out of the hidden layer and scale them back to 0.01 to 0.99
         hidden_outputs = scale(np.dot(self.who.T, final_inputs))
 
         # calculate the signal into the hidden layer
         hidden_inputs = self.inverse_activation_function(hidden_outputs)
+
         # calculate the signal out of the input layer and scale them back to 0.01 to .99
         inputs = scale(np.dot(self.wih.T, hidden_inputs))
 

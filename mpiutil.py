@@ -556,7 +556,7 @@ def transpose_blocks(row_array, shape, comm=_comm):
     comm.Barrier()
 
     # For each node iterate over all sends and wait until completion
-    for ir, _, request in requests_send:
+    for ir, ic, request in requests_send:
 
         stat = MPI.Status()
 
@@ -568,7 +568,7 @@ def transpose_blocks(row_array, shape, comm=_comm):
     comm.Barrier()
 
     # For each frequency iterate over all receives and wait until completion
-    for ir, _, request in requests_recv:
+    for ir, ic, request in requests_recv:
 
         stat = MPI.Status()
 

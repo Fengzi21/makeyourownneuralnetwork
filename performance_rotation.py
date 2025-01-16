@@ -2,7 +2,7 @@ import time
 import itertools
 
 import numpy as np
-from caput import mpiutil as mpi
+import mpiutil as mpi
 from rich import print
 import scipy.ndimage
 
