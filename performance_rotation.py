@@ -1,5 +1,6 @@
 import time
 import itertools
+from pathlib import Path
 
 import numpy as np
 import mpiutil as mpi
@@ -8,6 +9,9 @@ import scipy.ndimage
 
 from neural_network import Classifier
 
+
+save_dir = Path('./trained_classifiers')
+save_dir.mkdir(parents=True, exist_ok=True)
 
 with open('mnist_dataset/mnist_train.csv', 'r') as training_data_file:
     training_data_list = training_data_file.readlines()
@@ -35,17 +39,17 @@ for args in mpi.mpilist(ini_args):
     for e in range(epochs):
         for record in training_data_list:
             all_values = record.split(',')
-            inputs = (np.asfarray(all_values[1:]) / 255.0 * 0.99) + 0.01
+            inputs = (np.asarray(all_values[1:], dtype=float) / 255.0 * 0.99) + 0.01
             targets = np.zeros(output_nodes) + 0.01
             targets[int(all_values[0])] = 0.99
             n.train(inputs, targets)
 
-            inputs_plusx_img = scipy.ndimage.interpolation.rotate(
+            inputs_plusx_img = scipy.ndimage.rotate(
                 inputs.reshape(28, 28), angle, cval=0.01, order=1, reshape=False
             )
             n.train(inputs_plusx_img.reshape(784), targets)
             # rotated clockwise by x degrees
-            inputs_minusx_img = scipy.ndimage.interpolation.rotate(
+            inputs_minusx_img = scipy.ndimage.rotate(
                 inputs.reshape(28, 28), -angle, cval=0.01, order=1, reshape=False
             )
             n.train(inputs_minusx_img.reshape(784), targets)
@@ -56,18 +60,19 @@ for args in mpi.mpilist(ini_args):
     for record in test_data_list:
         all_values = record.split(',')
         correct_label = int(all_values[0])
-        inputs = (np.asfarray(all_values[1:]) / 255.0 * 0.99) + 0.01
+        inputs = (np.asarray(all_values[1:], dtype=float) / 255.0 * 0.99) + 0.01
         outputs = n.query(inputs)
         label = outputs.argmax()
         scorecard.append(1) if (label == correct_label) else scorecard.append(0)
 
-    scorecard_array = np.asarray(scorecard)
+    scorecard_array = np.asarray(scorecard, dtype=float)
     performance = scorecard_array.sum() / scorecard_array.size
 
-    print(f'{args}: {training_time = :.2f} seconds, {performance = }.')
+    print(f'{args}: {training_time = :.2f} seconds, {performance = :.4f}.')
 
-    filename = f'trained_classifiers/classifier_rotation_{learning_rate}_{epochs}.pkl'
+    filename = save_dir / f'classifier_rotation_{angle}_{epochs}.pkl'
     n.performance = performance
     n.training_time = training_time
     n.epochs = epochs
     n.pickle(filename)
+    print(f'Saved {filename}')

@@ -3,14 +3,18 @@
 
 import numpy as np
 from scipy.special import expit, logit  # sigmoid function and it's inverse
-import dill as pickle                   # for pickling the trained neural network
-import pandas as pd                     # for plotting progress
-from rich import print                  # comment this out if rich is not installed
+
+# pretty print
+try:
+    from rich import print
+except Exception:
+    pass
 
 
 def to_col_vec(row_list):
     """Convert a non-nested list to a column vector.
-    i.e. with shape (len(row_list, 1))
+
+    i.e. with shape (len(row_list), 1)
     """
     return np.array(row_list, ndmin=2).T
 
@@ -35,7 +39,7 @@ class Classifier:
         # set number of nodes in input, hidden and output layers
         self.inodes, self.hnodes, self.onodes = input_nodes, hidden_nodes, output_nodes
 
-        # random initial link weight matrices, wih and who
+        # randomly initial link weight matrices, wih and who
         # weights inside the arrays are wij,
         # where link is from node i to node j in the next layer
         # w11 w21
@@ -43,11 +47,12 @@ class Classifier:
         self.wih = np.random.normal(0.0, pow(self.hnodes, -0.5), (self.hnodes, self.inodes))
         self.who = np.random.normal(0.0, pow(self.onodes, -0.5), (self.onodes, self.hnodes))
 
-        # learning rate
+        # set learning rate
         self.lr = learning_rate
 
         # activation function is the sigmoid function
         self.activation_function = lambda x: expit(x)
+
         # inverse activation function is the logit function
         self.inverse_activation_function = lambda x: logit(x)
 
@@ -140,20 +145,30 @@ class Classifier:
     def plot_progress(self):
         """Plot classifier error.
         """
-        df = pd.DataFrame(self.progress, columns=['loss'])
-        plt_kwargs = {
-            'figsize': (16, 8),
-            # 'ylim':  (0, 1.0),
-            'ylim': (0, max(self.progress)),
-            'alpha': 0.1,
-            'marker': '.',
-            'grid': True,
-            # 'yticks':  (0, 0.25, 0.5)
-        }
-        df.plot(**plt_kwargs)
+        try:
+            import pandas as pd
+        except Exception:
+            raise RuntimeError('pandas needs to be installed to use this method.')
+        else:
+            df = pd.DataFrame(self.progress, columns=['loss'])
+            plt_kwargs = {
+                'figsize': (16, 8),
+                # 'ylim':  (0, 1.0),
+                'ylim': (0, max(self.progress)),
+                'alpha': 0.1,
+                'marker': '.',
+                'grid': True,
+                # 'yticks':  (0, 0.25, 0.5)
+            }
+            df.plot(**plt_kwargs)
 
     def pickle(self, filename='classifier.pkl'):
         """Pickle and save the trained classifier.
         """
-        with open(filename, 'wb') as f:
-            pickle.dump(self, f)
+        try:
+            import dill as pickle
+        except Exception:
+            raise RuntimeError('dill needs to be installed to use this method.')
+        else:
+            with open(filename, 'wb') as f:
+                pickle.dump(self, f)
