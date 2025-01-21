@@ -43,7 +43,7 @@ class Classifier(nn.Module):
 
         # use GPU if it is available
         # self.FloatTensor = torch.cuda.FloatTensor if device.type == 'cuda' else torch.FloatTensor  # on longer recommended
-        self.FloatTensor = partial(torch.tensor, dtype=torch.float32, device=device.type)
+        self.FloatTensor = partial(torch.tensor, dtype=torch.float64, device=device.type)
 
         # counter and accumulator for progress
         self.counter = 0

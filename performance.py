@@ -9,8 +9,11 @@ from rich import print
 from neural_network import Classifier
 
 
-save_dir = Path('./trained_classifiers')
-save_dir.mkdir(parents=True, exist_ok=True)
+save_model = True
+
+if save_model:
+    save_dir = Path('./trained_classifiers')
+    save_dir.mkdir(parents=True, exist_ok=True)
 
 with open('mnist_dataset/mnist_train.csv', 'r') as training_data_file:
     training_data_list = training_data_file.readlines()
@@ -56,11 +59,12 @@ for args in mpi.mpilist(ini_args):
     scorecard_array = np.asarray(scorecard, dtype=float)
     performance = scorecard_array.sum() / scorecard_array.size
 
-    print(f'{args}: {training_time = :.2f} seconds, {performance = :.4f}.')
+    print(f'{args}: {training_time = :.2f} seconds, {performance = :.4f}.')  # noqa
 
-    filename = save_dir / f'classifier_{hidden_nodes}_{learning_rate}_{epochs}.pkl'
-    n.performance = performance
-    n.training_time = training_time
-    n.epochs = epochs
-    n.pickle(filename)
-    print(f'Saved {filename}')
+    if save_model:
+        filename = save_dir / f'classifier_{hidden_nodes}_{learning_rate}_{epochs}.pkl'
+        n.performance = performance
+        n.training_time = training_time
+        n.epochs = epochs
+        n.pickle(filename)
+        print(f'Saved {filename}')

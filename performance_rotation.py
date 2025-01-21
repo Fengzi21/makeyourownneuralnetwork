@@ -29,7 +29,7 @@ input_nodes, hidden_nodes, output_nodes = 784, 200, 10
 learning_rate = 0.1
 
 for args in mpi.mpilist(ini_args):
-    # print(f"Start: {args} by rank {mpi.rank}")
+    print(f"Start: {args} by rank {mpi.rank}")
 
     angle, epochs = args
     n = Classifier(input_nodes, hidden_nodes, output_nodes, learning_rate)
@@ -68,7 +68,7 @@ for args in mpi.mpilist(ini_args):
     scorecard_array = np.asarray(scorecard, dtype=float)
     performance = scorecard_array.sum() / scorecard_array.size
 
-    print(f'{args}: {training_time = :.2f} seconds, {performance = :.4f}.')
+    print(f'{args}: {training_time = :.2f} seconds, {performance = :.4f}.')  # noqa
 
     filename = save_dir / f'classifier_rotation_{angle}_{epochs}.pkl'
     n.performance = performance
